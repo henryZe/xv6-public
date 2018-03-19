@@ -200,7 +200,7 @@ void cmostime(struct rtcdate *r)
   bcd = (sb & (1 << 2)) == 0;
 
   // make sure CMOS doesn't modify time while we read it
-  for(;;) {
+  for (;;) {
     fill_rtcdate(&t1);
     if(cmos_read(CMOS_STATA) & CMOS_UIP)
         continue;
@@ -210,7 +210,7 @@ void cmostime(struct rtcdate *r)
   }
 
   // convert
-  if(bcd) {
+  if (bcd) {
 #define    CONV(x)     (t1.x = ((t1.x >> 4) * 10) + (t1.x & 0xf))
     CONV(second);
     CONV(minute);
