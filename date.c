@@ -1,3 +1,6 @@
+/*
+ * user shell program "date"
+ */
 
 #include "types.h"
 #include "user.h"

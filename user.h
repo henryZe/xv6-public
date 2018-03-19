@@ -23,7 +23,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int date(struct rtcdate *);
+int date(struct rtcdate *);		/* export 'date' function to user, and definition in usys.S */
 
 // ulib.c
 int stat(char*, struct stat*);

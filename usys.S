@@ -1,6 +1,11 @@
 #include "syscall.h"
 #include "traps.h"
 
+/*
+ * Move INT num to eax,
+ * and use ' int INT_NUM ' to trap into kernel.
+ */
+
 #define SYSCALL(name) \
   .globl name; \
   name: \
