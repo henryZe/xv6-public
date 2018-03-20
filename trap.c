@@ -7,6 +7,7 @@
 #include "x86.h"
 #include "traps.h"
 #include "spinlock.h"
+#include "vm.h"
 
 // Interrupt descriptor table (shared by all CPUs).
 struct gatedesc idt[256];
@@ -36,6 +37,9 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
+  uint ptr;
+  char *mem;
+
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
       exit();
@@ -76,6 +80,28 @@ trap(struct trapframe *tf)
     cprintf("cpu%d: spurious interrupt at %x:%x\n",
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
+    break;
+
+  case T_PGFLT:
+    ptr = rcr2();
+    ptr = PGROUNDDOWN(ptr);
+
+    mem = kalloc();
+    if (mem == 0) {
+      cprintf("allocuvm out of memory\n");
+      myproc()->killed = 1;
+      break;
+    }
+
+    memset(mem, 0, PGSIZE);
+
+    if (mappages(myproc()->pgdir, (char*)ptr, PGSIZE, V2P(mem), PTE_W | PTE_U) < 0) {
+      cprintf("allocuvm out of memory (2)\n");
+      kfree(mem);
+      myproc()->killed = 1;
+      break;
+    }
+
     break;
 
   //PAGEBREAK: 13
