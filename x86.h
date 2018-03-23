@@ -167,7 +167,7 @@ struct trapframe {
   ushort padding3;
   ushort ds;
   ushort padding4;
-  uint trapno;
+  uint trapno;         // push by vector$i
 
   // below here defined by x86 hardware
   uint err;

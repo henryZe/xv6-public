@@ -39,6 +39,7 @@ trap(struct trapframe *tf)
 {
   uint ptr;
   char *mem;
+  int write;
 
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
@@ -83,23 +84,36 @@ trap(struct trapframe *tf)
     break;
 
   case T_PGFLT:
+    // FEC_WR
+    write = (tf->err & 0x2) > 0;
+
     ptr = rcr2();
     ptr = PGROUNDDOWN(ptr);
 
-    mem = kalloc();
-    if (mem == 0) {
-      cprintf("allocuvm out of memory\n");
-      myproc()->killed = 1;
-      break;
-    }
+    if (ptr < myproc()->sz) {
+      if (write) {
+        mem = kalloc();
+        if (mem == 0) {
+          cprintf("allocuvm out of memory\n");
+          myproc()->killed = 1;
+          break;
+        }
 
-    memset(mem, 0, PGSIZE);
+        memset(mem, 0, PGSIZE);
 
-    if (mappages(myproc()->pgdir, (char*)ptr, PGSIZE, V2P(mem), PTE_W | PTE_U) < 0) {
-      cprintf("allocuvm out of memory (2)\n");
-      kfree(mem);
-      myproc()->killed = 1;
-      break;
+        cprintf("kernel faulting in read/write page at %x\n", ptr);
+        if (mappages(myproc()->pgdir, (char*)ptr, PGSIZE, V2P(mem), PTE_W | PTE_U) < 0) {
+          cprintf("allocuvm out of memory (2)\n");
+          kfree(mem);
+          myproc()->killed = 1;
+          break;
+        }
+      }
+      else {
+        cprintf("kernel faulting in read-only zero page at %x\n", ptr);
+        // map zero page
+        mappages(myproc()->pgdir, (char*)ptr, PGSIZE, 0, PTE_U);
+      }
     }
 
     break;
