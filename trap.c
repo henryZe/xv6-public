@@ -59,6 +59,20 @@ trap(struct trapframe *tf)
       wakeup(&ticks);
       release(&tickslock);
     }
+
+    if (myproc() && (tf->cs & 3) == 3) {
+      myproc()->alarm_interval++;
+      if (myproc()->alarm_interval == myproc()->alarmticks) {
+        myproc()->alarm_interval = 0;
+
+        /* push userland eip to esp */
+        tf->esp -= sizeof(unsigned long);
+        *(uint *)tf->esp = tf->eip;
+
+        tf->eip = (uint)myproc()->alarmhandler;
+      }
+    }
+
     lapiceoi();
     break;
   case T_IRQ0 + IRQ_IDE:
