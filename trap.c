@@ -65,6 +65,10 @@ trap(struct trapframe *tf)
       if (myproc()->alarm_interval == myproc()->alarmticks) {
         myproc()->alarm_interval = 0;
 
+        /* push arg to esp */
+        tf->esp -= sizeof(unsigned long);
+        *(uint *)tf->esp = (uint)myproc()->alarm_arg;
+
         /* push userland eip to esp */
         tf->esp -= sizeof(unsigned long);
         *(uint *)tf->esp = tf->eip;

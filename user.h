@@ -24,7 +24,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int date(struct rtcdate *);		/* export 'date' function to user, and definition in usys.S */
-int alarm(int ticks, void (*handler)());
+int alarm(int ticks, void (*handler)(), void *data);
 
 // ulib.c
 int stat(char*, struct stat*);

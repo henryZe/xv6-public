@@ -51,6 +51,7 @@ struct proc {
   char name[16];               // Process name (debugging)
   int alarmticks;
   void (*alarmhandler)();
+  void *alarm_arg;
   int alarm_interval;
 };
 
