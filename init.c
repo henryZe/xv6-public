@@ -14,10 +14,10 @@ main(void)
 
   if(open("console", O_RDWR) < 0){
     mknod("console", 1, 1);
-    open("console", O_RDWR);
+    open("console", O_RDWR);	// 0: stdin
   }
-  dup(0);  // stdout
-  dup(0);  // stderr
+  dup(0);  // 1: stdout
+  dup(0);  // 2: stderr
 
   for(;;){
     printf(1, "init: starting sh\n");

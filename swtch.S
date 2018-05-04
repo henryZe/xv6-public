@@ -8,7 +8,9 @@
 
 .globl swtch
 swtch:
+  # load arg1 to eax
   movl 4(%esp), %eax
+  # load arg2 to edx
   movl 8(%esp), %edx
 
   # Save old callee-save registers
@@ -18,7 +20,9 @@ swtch:
   pushl %edi
 
   # Switch stacks
+  # push current esp to c->scheduler
   movl %esp, (%eax)
+  # push p->context to esp, finish re-schedule
   movl %edx, %esp
 
   # Load new callee-save registers
